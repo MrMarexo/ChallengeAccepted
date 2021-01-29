@@ -13,7 +13,7 @@ public class PopupManager : MonoBehaviour
     [SerializeField] GameObject mask;
 
 
-     float openSpeed = 0.4f;
+     float openSpeed = 0.6f;
      float closeSpeed = 0.2f;
 
 
