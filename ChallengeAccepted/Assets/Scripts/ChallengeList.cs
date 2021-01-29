@@ -6,14 +6,20 @@ using TMPro;
 public class ChallengeList : MonoBehaviour
 {
     [SerializeField] GameObject prefab;
-    [SerializeField] Transform contextTransform; 
-    
-    List<string> textList = new List<string>{ "1", "2", "3", "4", "5", "6", "7", "8" };
+    [SerializeField] Transform contextTransform;
+
+    List<string> textList = new List<string>();
+
 
 
     void Start()
     {
-        foreach(string item in textList)
+        for (int i = 1; i <= 100; ++i)
+        {
+            textList.Add(i.ToString());
+        }
+
+        foreach (string item in textList)
         {
             var newText = Instantiate(prefab, contextTransform);
             newText.GetComponent<TextMeshProUGUI>().text = item;

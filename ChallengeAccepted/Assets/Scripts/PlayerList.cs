@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class PlayerList : MonoBehaviour
 {
@@ -23,6 +24,14 @@ public class PlayerList : MonoBehaviour
     {
         int listChildrenCount = listTransform.childCount;
         var newPlayer = Instantiate(prefab, listTransform);
+        var playerChildrenArr = newPlayer.transform.GetComponentsInChildren<TextMeshProUGUI>();
+        foreach (TextMeshProUGUI child in playerChildrenArr)
+        {
+            if (child.gameObject.name == "Placeholder")
+            {
+                child.text = "Player " + (playerCount + 1).ToString();
+            }
+        }
         newPlayer.transform.SetSiblingIndex(listChildrenCount - 1);
         ++playerCount;
         CheckSigns();
