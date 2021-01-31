@@ -51,9 +51,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 71c1514a6bd24e1e882cebbe1904ce04, type: 3}
-  m_Name: YuseiMagic-Regular SDF
+  m_Name: red
   m_EditorClassIdentifier: 
-  hashCode: 953371572
+  hashCode: 125395
   material: {fileID: 633823356952828604}
   materialHashCode: -954182587
   m_Version: 1.1.0
@@ -1640,4 +1640,4 @@ Material:
     - _ReflectFaceColor: {r: 0, g: 0, b: 0, a: 1}
     - _ReflectOutlineColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
-    - _UnderlayColor: {r: 0.8470589, g: 0, b: 0.19607845, a: 1}
+    - _UnderlayColor: {r: 0.9294118, g: 0.9490197, b: 0.9568628, a: 1}

@@ -5,7 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - result
+  - resultNumber
   - popup
+  - mask
   layers:
   - Default
   - TransparentFX

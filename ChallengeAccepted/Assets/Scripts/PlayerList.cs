@@ -6,6 +6,8 @@ using TMPro;
 public class PlayerList : MonoBehaviour
 {
     [SerializeField] GameObject prefab;
+    [SerializeField] GameObject prefab2;
+
     [SerializeField] Transform listTransform;
 
     [SerializeField] GameObject plus;
@@ -23,7 +25,11 @@ public class PlayerList : MonoBehaviour
     public void AddPlayer()
     {
         int listChildrenCount = listTransform.childCount;
-        var newPlayer = Instantiate(prefab, listTransform);
+        var curPrefab = prefab;
+        if (listChildrenCount % 2 == 0) curPrefab = prefab2;
+        var newPlayer = Instantiate(curPrefab, listTransform);
+        var nameChild = newPlayer.transform.GetChild(0);
+        nameChild.localScale = Vector3.zero;
         var playerChildrenArr = newPlayer.transform.GetComponentsInChildren<TextMeshProUGUI>();
         foreach (TextMeshProUGUI child in playerChildrenArr)
         {
@@ -33,6 +39,7 @@ public class PlayerList : MonoBehaviour
             }
         }
         newPlayer.transform.SetSiblingIndex(listChildrenCount - 1);
+        LeanTween.scale(nameChild.gameObject, Vector3.one, 0.2f).setEaseOutElastic();
         ++playerCount;
         CheckSigns();
 
@@ -42,7 +49,14 @@ public class PlayerList : MonoBehaviour
     {
         int listChildrenCount = listTransform.childCount;
         var itemToRemove = listTransform.GetChild(listChildrenCount - 2);
-        Destroy(itemToRemove.gameObject);
+        foreach (Transform child in itemToRemove)
+        {
+            LeanTween.scale(child.gameObject, Vector3.zero, 0.2f).setEaseInElastic().setOnComplete(() =>
+            {
+                Destroy(itemToRemove.gameObject);
+            });
+        }
+        
         --playerCount;
         CheckSigns();
 

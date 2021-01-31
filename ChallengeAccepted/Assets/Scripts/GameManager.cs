@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+
     [SerializeField] GameObject transitionCanvas;
 
     int activeScene;
@@ -22,11 +23,26 @@ public class GameManager : MonoBehaviour
         {
             LeanTween.scale(image, Vector3.zero, 0.3f);
         }
+        CleanupScene();
+    }
+
+    private void CleanupScene()
+    {
+        var popups = GameObject.FindGameObjectsWithTag("popup");
+        var masks = GameObject.FindGameObjectsWithTag("mask");
+        foreach (GameObject popup in popups)
+        {
+            popup.SetActive(false);
+        }
+        foreach (GameObject mask in masks)
+        {
+            mask.SetActive(false);
+        }
     }
 
     public void NextScene()
     {
-        LoadSceneWithTransition(SceneManager.GetActiveScene().buildIndex + 1);
+        LoadSceneWithTransition(activeScene + 1);
     }
 
     public void Quit()
@@ -36,7 +52,7 @@ public class GameManager : MonoBehaviour
 
     public void PreviousScene()
     {
-        LoadSceneWithTransition(SceneManager.GetActiveScene().buildIndex - 1);
+        LoadSceneWithTransition(activeScene - 1);
     }
 
     void LoadSceneWithTransition(int index)
