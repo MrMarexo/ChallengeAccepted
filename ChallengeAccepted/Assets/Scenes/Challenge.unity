@@ -1376,6 +1376,7 @@ MonoBehaviour:
     type: 3}
   contextTransform: {fileID: 946752175}
   toggle: {fileID: 1260506955}
+  itemColor: {r: 0.7169812, g: 0.38938102, b: 0.07778571, a: 0}
 --- !u!4 &745325140
 Transform:
   m_ObjectHideFlags: 0

@@ -8,12 +8,19 @@ public class ChallengeList : MonoBehaviour
 {
     [SerializeField] GameObject prefab;
     [SerializeField] GameObject optionsPrefab;
+    [SerializeField] GameObject deleteCheckPrefab;
+
+
     [SerializeField] Transform contextTransform;
 
 
     [SerializeField] Toggle toggle;
 
     List<Challenge> list;
+
+    [SerializeField] Color itemColor;
+
+    public bool updated = false;
 
 
     void Start()
@@ -90,25 +97,81 @@ public class ChallengeList : MonoBehaviour
 
     public void DeleteChallenge(GameObject item, int index)
     {
+        var optionsItem = item.transform.GetChild(1); 
+        if (optionsItem.childCount > 3)
+        {
+            RemoveDeleteCheck(optionsItem.GetChild(optionsItem.childCount - 1).gameObject);
+            return;
+        }
+        Instantiate(deleteCheckPrefab, optionsItem);
+        StartCoroutine(WaitToDelete(item, index));
+        //Destroy(item);
+        //list.Remove(list[index]);
+        //PopulatePhysicalList();
+        //Debug.Log(list.Count);
+    }
+
+    IEnumerator WaitToDelete(GameObject item, int index)
+    {
+        yield return new WaitUntil(() => updated);
         Destroy(item);
         list.Remove(list[index]);
         PopulatePhysicalList();
         Debug.Log(list.Count);
     }
 
+    public void Answer(bool answer)
+    {
+
+        updated = true;
+
+    }
+
+    void RemoveDeleteCheck(GameObject checkItem)
+    {
+        Destroy(checkItem);
+    }
+
     public void AddOptions(GameObject item, int index)
     {
+        var image = item.GetComponent<Image>();
+
+        var color = image.color;
+        var tms = item.GetComponentsInChildren<TextMeshProUGUI>();
+        var tmColor = tms[0].color;
         if (item.transform.childCount > 1)
         {
-            DeleteOptions(item);
+            DeleteOptions(item, image, tms, color, tmColor);
             return;
         }
         var options = Instantiate(optionsPrefab, item.transform);
+        var iconImages = options.GetComponentsInChildren<Image>();
+        LeanTween.value(0.1f, 1f, 0.3f).setEaseOutQuint().setOnUpdate((value) =>
+        {
+            foreach (TextMeshProUGUI tm in tms)
+            {
+                tm.color = Color.Lerp(tmColor, Color.white, value);
+            }
+            image.color = Color.Lerp(color, Color.black, value);
+            foreach (Image img in iconImages)
+            {
+                img.transform.localScale = Vector3.Lerp(Vector3.zero, Vector3.one, value);
+            }
+        });
         options.GetComponentInChildren<Delete>().SetIndex(index);
+
     }
 
-    void DeleteOptions(GameObject parentItem)
+    void DeleteOptions(GameObject parentItem, Image image, TextMeshProUGUI[] tms, Color imageColor, Color tmColor)
     {
+        LeanTween.value(0.1f, 1f, 0.3f).setOnUpdate((value) =>
+        {
+            foreach (TextMeshProUGUI tm in tms)
+            {
+                tm.color = Color.Lerp(tmColor, Color.black, value);
+            }
+            image.color = Color.Lerp(imageColor, itemColor, value);
+        });
         Destroy(parentItem.transform.GetChild(1).gameObject);
     }
    
