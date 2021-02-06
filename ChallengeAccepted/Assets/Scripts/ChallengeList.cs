@@ -1,13 +1,24 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
+
+public enum ReceiverType
+{
+    None = 0,
+    Trash,
+    Delete,
+    Star,
+    Edit,
+    Number,
+    DisableOptions,
+    CancelDeletePrompt
+};
 
 public class ChallengeList : MonoBehaviour
 {
     [SerializeField] GameObject prefab;
-    [SerializeField] GameObject optionsPrefab;
     [SerializeField] GameObject deleteCheckPrefab;
 
 
@@ -18,20 +29,23 @@ public class ChallengeList : MonoBehaviour
 
     List<Challenge> list;
 
-    [SerializeField] Color itemColor;
+    GameObject listItemWithOptions;
 
-    public bool updated = false;
+    ActualList actual;
+
+
 
 
     void Start()
     {
-        list = GetComponent<ActualList>().GetList();
+        actual = GetComponent<ActualList>();
+        list = actual.GetList();
         Debug.Log(list.Count);
-        PopulatePhysicalList();
+        PopulateVisualList();
     }
-    
+
     //Populate "physical" list on the popup with texts //////////////////////////////////////////////////////////////////////////////////////////
-    void PopulatePhysicalList()
+    void PopulateVisualList()
     {
         foreach (Transform child in contextTransform)
         {
@@ -40,14 +54,17 @@ public class ChallengeList : MonoBehaviour
         for (int i = 0; i < list.Count; ++i)
         {
             var newText = Instantiate(prefab, contextTransform);
-            var tms = newText.GetComponentsInChildren<TextMeshProUGUI>();
-            tms[0].text = (i + 1).ToString();
-            tms[1].text = list[i].name;
-            newText.GetComponentInChildren<ListItem>().SetIndex(i);
+            newText.GetComponent<ListItem>().Initialize(i, list[i]);
         }
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    public void UpdateStarStatus(bool starStatus, int index)
+    {
+        list[index].isStared = starStatus;
+        Debug.Log("Challenge number " + index + " was changed status to: " + list[index].isStared);
+        //actual.SaveChanges(list);
+    }
 
     //Generate  new challenge for each player /////////////////////////////////////////////////////////////////////////////////////////////////
     public void Generate()
@@ -73,7 +90,7 @@ public class ChallengeList : MonoBehaviour
                 }
 
             }
-            
+
             var curChallenge = list[resIndex].name;
             var time = (resIndex + 1) * 0.01f;
             LeanTween.value(resultNumbers[i], 1f, resIndex + 1, time).setEaseInBounce().setOnUpdate((value) => ChangeValue(value, curResultNumber))
@@ -95,86 +112,56 @@ public class ChallengeList : MonoBehaviour
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public void DeleteChallenge(GameObject item, int index)
+    public void AdministerOpenedOptions(GameObject newListItem)
     {
-        var optionsItem = item.transform.GetChild(1); 
-        if (optionsItem.childCount > 3)
+        if (listItemWithOptions && listItemWithOptions != newListItem)
         {
-            RemoveDeleteCheck(optionsItem.GetChild(optionsItem.childCount - 1).gameObject);
-            return;
+            listItemWithOptions.GetComponent<ListItem>().ReceiveInfo(ReceiverType.DisableOptions);
+            listItemWithOptions = newListItem;
         }
-        Instantiate(deleteCheckPrefab, optionsItem);
-        StartCoroutine(WaitToDelete(item, index));
-        //Destroy(item);
-        //list.Remove(list[index]);
-        //PopulatePhysicalList();
-        //Debug.Log(list.Count);
+        listItemWithOptions = newListItem;
     }
 
-    IEnumerator WaitToDelete(GameObject item, int index)
+    public void DeleteChallengeFromList(int index, GameObject item)
     {
-        yield return new WaitUntil(() => updated);
-        Destroy(item);
+        StartCoroutine(Cleanup(index, item));
+    }
+
+    public IEnumerator Cleanup(int index, GameObject item)
+    {
+        yield return new WaitWhile(() => item);
         list.Remove(list[index]);
-        PopulatePhysicalList();
-        Debug.Log(list.Count);
+        PopulateVisualList();
     }
 
-    public void Answer(bool answer)
+
+    ////////////////////////////////////////////////////////////////////
+
+    public void AddNewChallenge(Challenge chal)
     {
+        var newText = Instantiate(prefab, contextTransform);
+        var listItem = newText.GetComponent<ListItem>();
+        listItem.Initialize(list.Count, chal);
+        listItem.ReceiveInfo(ReceiverType.Number);
+        list.Add(chal);
+        //actual.SaveChanges(list);
 
-        updated = true;
-
-    }
-
-    void RemoveDeleteCheck(GameObject checkItem)
-    {
-        Destroy(checkItem);
-    }
-
-    public void AddOptions(GameObject item, int index)
-    {
-        var image = item.GetComponent<Image>();
-
-        var color = image.color;
-        var tms = item.GetComponentsInChildren<TextMeshProUGUI>();
-        var tmColor = tms[0].color;
-        if (item.transform.childCount > 1)
+        //var heightOffest = contextTransform.GetComponent<RectTransform>().sizeDelta.y / 2;
+        //LeanTween.moveY(contextTransform.gameObject, contextTransform.position.y + 10000, 0.3f);
+        var scrollrect = contextTransform.GetComponentInParent<ScrollRect>();
+        var curPos = scrollrect.verticalNormalizedPosition;
+        LeanTween.value(curPos, 0, 0.3f).setEaseInExpo().setOnUpdate((value) =>
         {
-            DeleteOptions(item, image, tms, color, tmColor);
-            return;
-        }
-        var options = Instantiate(optionsPrefab, item.transform);
-        var iconImages = options.GetComponentsInChildren<Image>();
-        LeanTween.value(0.1f, 1f, 0.3f).setEaseOutQuint().setOnUpdate((value) =>
-        {
-            foreach (TextMeshProUGUI tm in tms)
-            {
-                tm.color = Color.Lerp(tmColor, Color.white, value);
-            }
-            image.color = Color.Lerp(color, Color.black, value);
-            foreach (Image img in iconImages)
-            {
-                img.transform.localScale = Vector3.Lerp(Vector3.zero, Vector3.one, value);
-            }
+            scrollrect.verticalNormalizedPosition = value;
         });
-        options.GetComponentInChildren<Delete>().SetIndex(index);
-
     }
 
-    void DeleteOptions(GameObject parentItem, Image image, TextMeshProUGUI[] tms, Color imageColor, Color tmColor)
-    {
-        LeanTween.value(0.1f, 1f, 0.3f).setOnUpdate((value) =>
-        {
-            foreach (TextMeshProUGUI tm in tms)
-            {
-                tm.color = Color.Lerp(tmColor, Color.black, value);
-            }
-            image.color = Color.Lerp(imageColor, itemColor, value);
-        });
-        Destroy(parentItem.transform.GetChild(1).gameObject);
-    }
-   
+
+
+
+
+
+
 
 
 }

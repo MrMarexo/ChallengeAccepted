@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 
 public class PlayerList : MonoBehaviour
 {
@@ -18,7 +18,7 @@ public class PlayerList : MonoBehaviour
 
     private void Start()
     {
-        CheckSigns();
+        CheckControls();
     }
 
 
@@ -26,7 +26,11 @@ public class PlayerList : MonoBehaviour
     {
         int listChildrenCount = listTransform.childCount;
         var curPrefab = prefab;
-        if (listChildrenCount % 2 == 0) curPrefab = prefab2;
+        if (listChildrenCount % 2 == 0)
+        {
+            curPrefab = prefab2;
+        }
+
         var newPlayer = Instantiate(curPrefab, listTransform);
         var nameChild = newPlayer.transform.GetChild(0);
         nameChild.localScale = Vector3.zero;
@@ -41,7 +45,7 @@ public class PlayerList : MonoBehaviour
         newPlayer.transform.SetSiblingIndex(listChildrenCount - 1);
         LeanTween.scale(nameChild.gameObject, Vector3.one, 0.2f).setEaseOutElastic();
         ++playerCount;
-        CheckSigns();
+        CheckControls();
 
     }
 
@@ -49,26 +53,39 @@ public class PlayerList : MonoBehaviour
     {
         int listChildrenCount = listTransform.childCount;
         var itemToRemove = listTransform.GetChild(listChildrenCount - 2);
-        foreach (Transform child in itemToRemove)
+        LeanTween.value(0, 1, 0.1f).setEaseInExpo().setOnUpdate((value) =>
         {
-            LeanTween.scale(child.gameObject, Vector3.zero, 0.2f).setEaseInElastic().setOnComplete(() =>
+            foreach (Transform child in itemToRemove)
             {
-                Destroy(itemToRemove.gameObject);
-            });
-        }
-        
-        --playerCount;
-        CheckSigns();
-
+                child.localScale = Vector3.Lerp(Vector3.one, Vector3.zero, value);
+            }
+        }).setOnComplete(() =>
+        {
+            Destroy(itemToRemove.gameObject);
+            --playerCount;
+            CheckControls();
+        });
     }
 
-    void CheckSigns()
+    void CheckControls()
     {
-        if (playerCount <= 1) minus.SetActive(false);
-        else minus.SetActive(true);
+        if (playerCount <= 1)
+        {
+            minus.SetActive(false);
+        }
+        else
+        {
+            minus.SetActive(true);
+        }
 
-        if (playerCount >= 4) plus.SetActive(false);
-        else plus.SetActive(true);
+        if (playerCount >= 4)
+        {
+            plus.SetActive(false);
+        }
+        else
+        {
+            plus.SetActive(true);
+        }
     }
 
     public int GetPlayerCount()

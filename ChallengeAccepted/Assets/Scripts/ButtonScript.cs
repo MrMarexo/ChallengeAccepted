@@ -1,17 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using TMPro;
-using UnityEngine.UI;
+﻿using UnityEngine;
+using UnityEngine.EventSystems;
 
-public class ButtonScript : MonoBehaviour
+
+public class ButtonScript : MonoBehaviour, IPointerDownHandler
 {
-    //Color32 red = new Color32(239, 35, 60, 255);
-    //Color32 white = new Color32(237, 242, 244, 255);
 
-    //TextMeshProUGUI tm;
-    //Color32 otherColor;
-    //Color32 curColor;
 
     float tweenTime = 0.4f;
 
@@ -29,8 +22,14 @@ public class ButtonScript : MonoBehaviour
     //        otherColor = red;
     //    }
     //}
-        
-    public void Click()
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        Click();
+
+    }
+
+    void Click()
     {
         LeanTween.scale(gameObject, new Vector3(0.9f, 0.9f, 0.9f), tweenTime).setEasePunch();
         //LeanTween.value(gameObject, 0.1f, 1f, tweenTime).setEasePunch().setOnUpdate((value) =>
@@ -42,3 +41,4 @@ public class ButtonScript : MonoBehaviour
         //});
     }
 }
+

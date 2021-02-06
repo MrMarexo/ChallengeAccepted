@@ -1,17 +1,19 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System.IO;
+using UnityEngine;
 
-public struct Challenge
+public class Challenge
 {
     public string name;
     public bool coronaFriendly;
+    public bool isStared;
 
-    public Challenge(string name, bool coronaFriendly)
+    public Challenge(string name, bool coronaFriendly, bool isStared = false)
     {
         this.name = name;
         this.coronaFriendly = coronaFriendly;
+        this.isStared = isStared;
     }
 };
 
@@ -38,6 +40,12 @@ public class ActualList : MonoBehaviour
         {
             this.strings = strings;
         }
+    }
+
+    public void SaveChanges(List<Challenge> list)
+    {
+        Save(MyListToJson(list));
+        Debug.Log("SAVED");
     }
 
     private void Awake()
