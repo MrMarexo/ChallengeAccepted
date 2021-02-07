@@ -8,12 +8,14 @@ public class Challenge
     public string name;
     public bool coronaFriendly;
     public bool isStared;
+    public bool wasCreated;
 
-    public Challenge(string name, bool coronaFriendly, bool isStared = false)
+    public Challenge(string name, bool coronaFriendly, bool isStared = false, bool wasCreated = false)
     {
         this.name = name;
         this.coronaFriendly = coronaFriendly;
         this.isStared = isStared;
+        this.wasCreated = wasCreated;
     }
 };
 

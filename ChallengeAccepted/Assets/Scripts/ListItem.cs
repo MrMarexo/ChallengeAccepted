@@ -11,6 +11,9 @@ using UnityEngine.UI;
 public class ListItem : MonoBehaviour
 {
     int listItemIndex;
+
+    Challenge challenge;
+
     bool isStared;
 
     bool starIsAnimating;
@@ -34,14 +37,22 @@ public class ListItem : MonoBehaviour
         tms[0].text = (index + 1).ToString();
         tms[1].text = chal.name;
 
-        //FindReceiver(ReceiverType.Number).GetComponent<TextMeshProUGUI>().text = (index + 1).ToString();
-        //GetComponentInChildren<TMP_InputField>().text = chal.name;
+        if (!chal.wasCreated)
+        {
+            FindReceiver(ReceiverType.Edit).SetActive(false);
+        }
+        else
+        {
+            FindReceiver(ReceiverType.Edit).SetActive(true);
+            FindReceiver(ReceiverType.Number).GetComponent<TextMeshProUGUI>().fontStyle = FontStyles.Italic | FontStyles.Bold;
+        }
 
         if (chal.coronaFriendly)
         {
             transform.Find(Names.MAIN).GetComponentInChildren<Image>().gameObject.SetActive(false);
         }
         listItemIndex = index;
+        challenge = chal;
         isStared = chal.isStared;
         if (chal.isStared)
         {
@@ -50,6 +61,20 @@ public class ListItem : MonoBehaviour
         }
         image = GetComponent<Image>();
         transform.Find(Names.OPTIONS).gameObject.SetActive(false);
+    }
+
+    public void ChangeAfterEdit(Challenge chal)
+    {
+        var tms = GetComponentsInChildren<TextMeshProUGUI>();
+        tms[1].text = chal.name;
+        challenge = chal;
+        var social = transform.Find(Names.MAIN).GetComponentInChildren<Image>(true);
+        social.gameObject.SetActive(!chal.coronaFriendly);
+        if (!chal.coronaFriendly)
+        {
+            social.color = optionsSocialColor;
+        }
+        FindObjectOfType<ChallengeList>().SaveEditedChallenge(listItemIndex, chal);
     }
 
     GameObject FindReceiver(ReceiverType type)
@@ -76,7 +101,8 @@ public class ListItem : MonoBehaviour
                 break;
 
             case ReceiverType.Edit:
-                //edit func
+                Debug.Log(challenge.name);
+                Resources.FindObjectsOfTypeAll<EditPopup>()[0].InitializeEdit(challenge, this);
                 break;
 
             case ReceiverType.Star:
@@ -105,6 +131,8 @@ public class ListItem : MonoBehaviour
 
         }
     }
+
+
 
     void Star()
     {

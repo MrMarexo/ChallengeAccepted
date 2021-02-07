@@ -156,6 +156,14 @@ public class ChallengeList : MonoBehaviour
         });
     }
 
+    ////////////////////////////////////////////////////////////////////
+
+    public void SaveEditedChallenge(int index, Challenge chal)
+    {
+        list[index] = chal;
+        //actual.SaveChanges(list);
+    }
+
 
 
 

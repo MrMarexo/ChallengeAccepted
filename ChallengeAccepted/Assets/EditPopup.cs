@@ -4,21 +4,24 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class AddPopup : MonoBehaviour
+public class EditPopup : MonoBehaviour
 {
     [SerializeField] Toggle toggle;
     [SerializeField] TMP_InputField text;
     [SerializeField] GameObject warning;
 
-    public void SaveNewChallenge()
+    ListItem item;
+    Challenge chal;
+
+    public void SaveEdit()
     {
         if (text.text == "")
         {
             NoTextWarning();
             return;
         }
-        var chal = new Challenge(text.text, toggle.isOn, false, true);
-        FindObjectOfType<ChallengeList>().AddNewChallenge(chal);
+        var challenge = new Challenge(text.text, toggle.isOn, chal.isStared, true);
+        item.ChangeAfterEdit(challenge);
         ResetData();
         GetComponent<Popup>().ClosePopup();
     }
@@ -30,10 +33,19 @@ public class AddPopup : MonoBehaviour
         LeanTween.scale(warning, Vector3.one, 0.2f).setEaseInExpo();
     }
 
-    void ResetData()
+    public void ResetData()
     {
         toggle.isOn = true;
         text.text = "";
         warning.SetActive(false);
+    }
+
+    public void InitializeEdit(Challenge challenge, ListItem listItem)
+    {
+        text.text = challenge.name;
+        toggle.isOn = challenge.coronaFriendly;
+        GetComponent<Popup>().OpenPopup();
+        chal = challenge;
+        item = listItem;
     }
 }
