@@ -24,7 +24,7 @@ public class Popup : MonoBehaviour
     public void ClosePopup()
     {
         var panel = gameObject.GetComponentInChildren<Image>().gameObject;
-        LeanTween.scale(panel, new Vector3(0, 0, 0), closeSpeed).setEaseInSine()
+        LeanTween.scale(panel, new Vector3(0, 0, 0), closeSpeed).setEaseInExpo()
             .setOnComplete(() =>
             {
                 gameObject.SetActive(false);
@@ -42,7 +42,7 @@ public class Popup : MonoBehaviour
 
         }
         ToggleMask(true);
-        LeanTween.scale(panel, new Vector3(1, 1, 1), openSpeed).setEaseOutBounce();
+        LeanTween.scale(panel, new Vector3(1, 1, 1), openSpeed).setEaseOutExpo();
     }
 
     void ToggleMask(bool tf)
@@ -55,7 +55,7 @@ public class Popup : MonoBehaviour
             tempColor.a = 0f;
             image.color = tempColor;
             mask.SetActive(true);
-            LeanTween.alpha(image.rectTransform, originalAlpha, openSpeed).setEaseOutBounce();
+            LeanTween.alpha(image.rectTransform, originalAlpha, openSpeed).setEaseOutExpo();
         }
         else
         {

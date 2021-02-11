@@ -2130,7 +2130,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefab: {fileID: 1268004307408477, guid: 6c4c931693608574ea0ea34b39bb7f26, type: 3}
-  prefab2: {fileID: 1268004307408477, guid: 5faaf2d5ad6b7b340a945e9432b79d92, type: 3}
+  prefab2: {fileID: 1268004307408477, guid: 89fc770c91b403748bd2a1f98f21c124, type: 3}
   listTransform: {fileID: 1815012114}
   plus: {fileID: 27862152}
   minus: {fileID: 2131382588}

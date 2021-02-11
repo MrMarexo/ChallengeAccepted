@@ -8,6 +8,7 @@ TagManager:
   - resultNumber
   - popup
   - mask
+  - playerStar
   layers:
   - Default
   - TransparentFX

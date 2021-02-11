@@ -21,7 +21,6 @@ public class ChallengeList : MonoBehaviour
     [SerializeField] GameObject prefab;
     [SerializeField] GameObject deleteCheckPrefab;
 
-
     [SerializeField] Transform contextTransform;
 
 
@@ -36,12 +35,20 @@ public class ChallengeList : MonoBehaviour
 
 
 
+
+
     void Start()
     {
         actual = GetComponent<ActualList>();
         list = actual.GetList();
-        Debug.Log(list.Count);
         PopulateVisualList();
+
+        var stars = GameObject.FindGameObjectsWithTag("playerStar");
+        foreach (GameObject star in stars)
+        {
+            SetAlphaTo(0, star.GetComponent<Image>());
+        }
+
     }
 
     //Populate "physical" list on the popup with texts //////////////////////////////////////////////////////////////////////////////////////////
@@ -74,13 +81,33 @@ public class ChallengeList : MonoBehaviour
         int playerCount = GetComponent<PlayerList>().GetPlayerCount();
         var results = GameObject.FindGameObjectsWithTag("result");
         var resultNumbers = GameObject.FindGameObjectsWithTag("resultNumber");
+        var stars = GameObject.FindGameObjectsWithTag("playerStar");
+
+        foreach (GameObject star in stars)
+        {
+            SetAlphaTo(0, star.GetComponent<Image>());
+        }
 
         for (int i = 0; i < playerCount; ++i)
         {
+            var shouldShowStar = false;
+            var curStarImage = stars[i].GetComponent<Image>();
+            var curResultNumberGO = resultNumbers[i];
+            var curResultGO = results[i];
+            curResultGO.GetComponent<TextMeshProUGUI>().text = "";
 
-            var curResultNumber = resultNumbers[i];
-            var curResult = results[i];
-            curResult.GetComponent<TextMeshProUGUI>().text = "";
+
+            var counterOfAdded = 0;
+            var originalCount = list.Count;
+            for (int ind = 0; ind < originalCount; ++ind)
+            {
+                if (list[ind].isStared)
+                {
+                    list.Add(list[ind]);
+                    ++counterOfAdded;
+                }
+            }
+
             var resIndex = Random.Range(0, list.Count);
             if (corona)
             {
@@ -88,13 +115,26 @@ public class ChallengeList : MonoBehaviour
                 {
                     resIndex = Random.Range(0, list.Count);
                 }
-
+            }
+            var curChallenge = list[resIndex];
+            if (curChallenge.isStared)
+            {
+                shouldShowStar = true;
             }
 
-            var curChallenge = list[resIndex].name;
-            var time = (resIndex + 1) * 0.01f;
-            LeanTween.value(resultNumbers[i], 1f, resIndex + 1, time).setEaseInBounce().setOnUpdate((value) => ChangeValue(value, curResultNumber))
-                .setOnComplete(() => ChangeText(curResult, curChallenge));
+            for (int ind = 0; ind < counterOfAdded; ++ind)
+            {
+                list.RemoveAt(list.Count - 1);
+            }
+
+            if (list.Count != originalCount)
+            {
+                Debug.LogWarning("Something is wrong here dude!");
+            }
+            var realResIndex = list.FindIndex((x) => x == curChallenge);
+            var time = (realResIndex + 1) * 0.01f;
+            LeanTween.value(resultNumbers[i], 1f, realResIndex + 1, time).setEaseInBounce().setOnUpdate((value) => ChangeValue(value, curResultNumberGO))
+                .setOnComplete(() => PerformFinalChange(curResultGO, curChallenge.name, curStarImage, shouldShowStar));
         }
 
         void ChangeValue(float value, GameObject resultNumber)
@@ -102,12 +142,21 @@ public class ChallengeList : MonoBehaviour
             resultNumber.GetComponent<TextMeshProUGUI>().text = value.ToString("F0");
         }
 
-        void ChangeText(GameObject result, string challenge)
+        void PerformFinalChange(GameObject result, string challenge, Image star, bool shouldShow)
         {
             result.transform.localScale = Vector3.zero;
             result.GetComponent<TextMeshProUGUI>().text = challenge;
-            LeanTween.scale(result, Vector3.one, 0.1f).setEaseOutElastic();
+            LeanTween.scale(result, Vector3.one, 0.2f).setEaseOutExpo();
+            if (shouldShow)
+            {
+                LeanTween.value(0, 1, 0.8f).setEaseOutExpo().setOnUpdate((value) =>
+                {
+                    SetAlphaTo(value, star);
+                });
+            }
         }
+
+
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -162,6 +211,16 @@ public class ChallengeList : MonoBehaviour
     {
         list[index] = chal;
         //actual.SaveChanges(list);
+    }
+
+
+    ///////////////////////////////////////////////////////////////////////////
+
+    void SetAlphaTo(float alpha, Image star)
+    {
+        var newColor = star.color;
+        newColor.a = alpha;
+        star.color = newColor;
     }
 
 
