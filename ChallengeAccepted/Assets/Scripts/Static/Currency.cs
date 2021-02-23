@@ -2,9 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class Points
+public static class Currency
 {
     public static int NumberOfPoints { get; private set; }
+    public static int NumberOfStars { get; set; } = 3;
+    public static int NumberOfDeletes { get; set; } = 3;
+    public static int NumberOfNew { get; set; } = 3;
+
 
     public static void ChangeNumberOfPoints(int offset)
     {
@@ -31,6 +35,9 @@ public static class Points
 
         return true;
     }
+
+
+
 
 }
 

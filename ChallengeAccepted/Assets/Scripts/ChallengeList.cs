@@ -24,23 +24,37 @@ public class ChallengeList : MonoBehaviour
     [SerializeField] Transform contextTransform;
 
 
-    [SerializeField] Toggle toggle;
+    [SerializeField] Toggle socialToggle;
+    [SerializeField] Toggle repeatToggle;
 
-    List<Challenge> list;
+    public static List<Challenge> challengeList;
 
     GameObject listItemWithOptions;
 
-    ActualList actual;
 
+    List<string> listOfGenerated = new List<string>();
 
+    public static Challenge FindChallengeByKey(string key)
+    {
+        Challenge desiredChal = new Challenge("", true, "X");
+        foreach (Challenge chal in challengeList)
+        {
+            if (chal.key == key)
+            {
+                desiredChal = chal;
+            }
+        }
+        return desiredChal;
+    }
 
-
-
+    public static int GetNumberOfChallengeInList(Challenge chal)
+    {
+        return challengeList.IndexOf(chal) + 1;
+    }
 
     void Start()
     {
-        actual = GetComponent<ActualList>();
-        list = actual.GetList();
+        challengeList = GetComponent<ActualList>().GetList();
         PopulateVisualList();
 
         var stars = GameObject.FindGameObjectsWithTag("playerStar");
@@ -48,28 +62,28 @@ public class ChallengeList : MonoBehaviour
         {
             SetAlphaTo(0, star.GetComponent<Image>());
         }
-
+        listOfGenerated.Clear();
     }
 
     //Populate "physical" list on the popup with texts //////////////////////////////////////////////////////////////////////////////////////////
-    void PopulateVisualList()
+    public void PopulateVisualList()
     {
         foreach (Transform child in contextTransform)
         {
             Destroy(child.gameObject);
         }
-        for (int i = 0; i < list.Count; ++i)
+        for (int i = 0; i < challengeList.Count; ++i)
         {
             var newText = Instantiate(prefab, contextTransform);
-            newText.GetComponent<ListItem>().Initialize(i, list[i]);
+            newText.GetComponent<ListItem>().Initialize(i, challengeList[i]);
         }
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public void UpdateStarStatus(bool starStatus, int index)
     {
-        list[index].isStared = starStatus;
-        Debug.Log("Challenge number " + index + " was changed status to: " + list[index].isStared);
+        challengeList[index].isStared = starStatus;
+        Debug.Log("Challenge number " + index + " was changed status to: " + challengeList[index].isStared);
         //actual.SaveChanges(list);
     }
 
@@ -77,8 +91,9 @@ public class ChallengeList : MonoBehaviour
     public void Generate()
     {
         GetComponent<Quote>().Leave();
-        bool corona = toggle.isOn;
-        int playerCount = GetComponent<PlayerList>().GetPlayerCount();
+        bool corona = socialToggle.isOn;
+        bool repeat = repeatToggle.isOn;
+        var playerList = PlayerList.playerList;
         var results = GameObject.FindGameObjectsWithTag("result");
         var resultNumbers = GameObject.FindGameObjectsWithTag("resultNumber");
         var stars = GameObject.FindGameObjectsWithTag("playerStar");
@@ -88,35 +103,50 @@ public class ChallengeList : MonoBehaviour
             SetAlphaTo(0, star.GetComponent<Image>());
         }
 
-        for (int i = 0; i < playerCount; ++i)
+        for (int i = 0; i < playerList.Count; ++i)
         {
             var shouldShowStar = false;
             var curStarImage = stars[i].GetComponent<Image>();
             var curResultNumberGO = resultNumbers[i];
             var curResultGO = results[i];
-            curResultGO.GetComponent<TextMeshProUGUI>().text = "";
 
 
             var counterOfAdded = 0;
-            var originalCount = list.Count;
+            var originalCount = challengeList.Count;
             for (int ind = 0; ind < originalCount; ++ind)
             {
-                if (list[ind].isStared)
+                if (challengeList[ind].isStared)
                 {
-                    list.Add(list[ind]);
+                    challengeList.Add(challengeList[ind]);
                     ++counterOfAdded;
                 }
             }
 
-            var resIndex = Random.Range(0, list.Count);
+            var resIndex = Random.Range(0, challengeList.Count);
             if (corona)
             {
-                while (!list[resIndex].coronaFriendly)
+                while (!challengeList[resIndex].coronaFriendly)
                 {
-                    resIndex = Random.Range(0, list.Count);
+                    resIndex = Random.Range(0, challengeList.Count);
                 }
             }
-            var curChallenge = list[resIndex];
+            if (!repeat)
+            {
+                if (challengeList.Count - listOfGenerated.Count <= playerList.Count)
+                {
+                    Debug.Log("all challenges used");
+                    return;
+                }
+                while (listOfGenerated.Contains(challengeList[resIndex].key))
+                {
+                    resIndex = Random.Range(0, challengeList.Count);
+
+                }
+            }
+
+            var curChallenge = challengeList[resIndex];
+            playerList[i].playerData.generatedChallenges.Add(new PlayerChallenge(curChallenge.key));
+
             if (curChallenge.isStared)
             {
                 shouldShowStar = true;
@@ -124,14 +154,18 @@ public class ChallengeList : MonoBehaviour
 
             for (int ind = 0; ind < counterOfAdded; ++ind)
             {
-                list.RemoveAt(list.Count - 1);
+                challengeList.RemoveAt(challengeList.Count - 1);
             }
 
-            if (list.Count != originalCount)
+            if (challengeList.Count != originalCount)
             {
                 Debug.LogWarning("Something is wrong here dude!");
             }
-            var realResIndex = list.FindIndex((x) => x == curChallenge);
+
+            curResultGO.GetComponent<TextMeshProUGUI>().text = "";
+
+            var realResIndex = challengeList.FindIndex((x) => x == curChallenge);
+            listOfGenerated.Add(challengeList[realResIndex].key);
             var time = (realResIndex + 1) * 0.01f;
             LeanTween.value(resultNumbers[i], 1f, realResIndex + 1, time).setEaseInBounce().setOnUpdate((value) => ChangeValue(value, curResultNumberGO))
                 .setOnComplete(() => PerformFinalChange(curResultGO, curChallenge.name, curStarImage, shouldShowStar));
@@ -156,7 +190,6 @@ public class ChallengeList : MonoBehaviour
             }
         }
 
-
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -179,24 +212,36 @@ public class ChallengeList : MonoBehaviour
     public IEnumerator Cleanup(int index, GameObject item)
     {
         yield return new WaitWhile(() => item);
-        list.Remove(list[index]);
+        challengeList.Remove(challengeList[index]);
         PopulateVisualList();
     }
 
 
     ////////////////////////////////////////////////////////////////////
 
-    public void AddNewChallenge(Challenge chal)
+    public void AddNewChallenge(string name, bool social)
     {
         var newText = Instantiate(prefab, contextTransform);
         var listItem = newText.GetComponent<ListItem>();
-        listItem.Initialize(list.Count, chal);
+        var chal = new Challenge(name, social, KeyGenerator(), false, true);
+        listItem.Initialize(challengeList.Count, chal);
         listItem.ReceiveInfo(ReceiverType.Number);
-        list.Add(chal);
+        challengeList.Add(chal);
         //actual.SaveChanges(list);
 
-        //var heightOffest = contextTransform.GetComponent<RectTransform>().sizeDelta.y / 2;
-        //LeanTween.moveY(contextTransform.gameObject, contextTransform.position.y + 10000, 0.3f);
+        ScrollToBottom();
+    }
+
+    string KeyGenerator()
+    {
+        var date = System.DateTime.Now.ToString();
+        date = date.Replace(" ", "-");
+        var key = "new#kn" + date;
+        return key;
+    }
+
+    void ScrollToBottom()
+    {
         var scrollrect = contextTransform.GetComponentInParent<ScrollRect>();
         var curPos = scrollrect.verticalNormalizedPosition;
         LeanTween.value(curPos, 0, 0.3f).setEaseInExpo().setOnUpdate((value) =>
@@ -209,7 +254,7 @@ public class ChallengeList : MonoBehaviour
 
     public void SaveEditedChallenge(int index, Challenge chal)
     {
-        list[index] = chal;
+        challengeList[index] = chal;
         //actual.SaveChanges(list);
     }
 
@@ -224,11 +269,11 @@ public class ChallengeList : MonoBehaviour
     }
 
 
+    ///////////////////////////////////////////////////////////////////////
 
-
-
-
-
-
+    public void LastTwoInList()
+    {
+        ScrollToBottom();
+    }
 
 }

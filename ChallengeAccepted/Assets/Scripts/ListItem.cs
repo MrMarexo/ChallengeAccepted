@@ -13,6 +13,9 @@ public class ListItem : MonoBehaviour
     int listItemIndex;
 
     Challenge challenge;
+    string challengeName;
+    string challengeSocial;
+
 
     bool isStared;
 
@@ -270,6 +273,12 @@ public class ListItem : MonoBehaviour
         var socialImage = transform.Find(Names.MAIN).GetComponentInChildren<Image>();
         FindObjectOfType<ChallengeList>().AdministerOpenedOptions(gameObject);
         options.SetActive(true);
+
+        if (listItemIndex >= ChallengeList.challengeList.Count - 2)
+        {
+            FindObjectOfType<ChallengeList>().LastTwoInList();
+        }
+
         LeanTween.value(0, 1f, 0.3f).setOnUpdate((value) =>
         {
             if (!isStared)

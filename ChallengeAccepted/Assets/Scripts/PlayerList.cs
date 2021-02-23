@@ -2,6 +2,31 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
+
+public class PlayerChallenge
+{
+    public string key;
+    public bool isFinished;
+
+    public PlayerChallenge(string key, bool isFinished = false)
+    {
+        this.key = key;
+        this.isFinished = isFinished;
+    }
+}
+
+public class PlayerData
+{
+    public List<PlayerChallenge> generatedChallenges;
+    public string name;
+
+    public PlayerData(List<PlayerChallenge> generatedChallenges, string name)
+    {
+        this.generatedChallenges = generatedChallenges;
+        this.name = name;
+    }
+}
 
 public class PlayerList : MonoBehaviour
 {
@@ -11,18 +36,24 @@ public class PlayerList : MonoBehaviour
     [SerializeField] Transform listTransform;
 
     [SerializeField] GameObject plus;
-    [SerializeField] GameObject minus;
 
+    public static List<Player> playerList = new List<Player>();
 
-    int playerCount = 1;
 
     private void Start()
     {
-        CheckControls();
+        playerList.Clear();
+        AddPlayer();
+        ChangePlusSign();
+
     }
 
+    public void AddFromButton()
+    {
+        AddPlayer();
+    }
 
-    public void AddPlayer()
+    void AddPlayer(PlayerData data = null, bool wasUsed = false)
     {
         int listChildrenCount = listTransform.childCount;
         var curPrefab = prefab;
@@ -30,67 +61,96 @@ public class PlayerList : MonoBehaviour
         {
             curPrefab = prefab2;
         }
-
         var newPlayer = Instantiate(curPrefab, listTransform);
-        var nameChild = newPlayer.transform.GetChild(0);
-        nameChild.localScale = Vector3.zero;
-        var playerChildrenArr = newPlayer.transform.GetComponentsInChildren<TextMeshProUGUI>();
-        foreach (TextMeshProUGUI child in playerChildrenArr)
+        var newPlayerScript = newPlayer.GetComponent<Player>();
+        if (data != null)
         {
-            if (child.gameObject.name == "Placeholder")
+            if (data.generatedChallenges.Count == 0)
             {
-                child.text = "Player " + (playerCount + 1).ToString();
+                newPlayerScript.WasAdded(data);
             }
+            newPlayerScript.WasAdded(data, wasUsed);
+        }
+        else
+        {
+            newPlayerScript.WasAdded(new PlayerData(new List<PlayerChallenge>(), CalculatePlaceholderName()));
         }
         newPlayer.transform.SetSiblingIndex(listChildrenCount - 1);
-        LeanTween.scale(nameChild.gameObject, Vector3.one, 0.2f).setEaseOutElastic();
-        ++playerCount;
-        CheckControls();
+        ChangePlusSign();
 
     }
+
+    string CalculatePlaceholderName()
+    {
+        return "Player " + (playerList.Count).ToString();
+    }
+
 
     public void RemovePlayer()
     {
         int listChildrenCount = listTransform.childCount;
         var itemToRemove = listTransform.GetChild(listChildrenCount - 2);
-        LeanTween.value(0, 1, 0.1f).setEaseInExpo().setOnUpdate((value) =>
-        {
-            foreach (Transform child in itemToRemove)
-            {
-                child.localScale = Vector3.Lerp(Vector3.one, Vector3.zero, value);
-            }
-        }).setOnComplete(() =>
-        {
-            Destroy(itemToRemove.gameObject);
-            --playerCount;
-            CheckControls();
-        });
+        itemToRemove.GetComponent<Player>().WasRemoved();
     }
 
-    void CheckControls()
+    void ChangePlusSign()
     {
-        if (playerCount <= 1)
+        if (playerList.Count % 2 == 0)
         {
-            minus.SetActive(false);
+            plus.GetComponentInChildren<Image>().color = Color.black;
         }
         else
         {
-            minus.SetActive(true);
-        }
-
-        if (playerCount >= 4)
-        {
-            plus.SetActive(false);
-        }
-        else
-        {
-            plus.SetActive(true);
+            plus.GetComponentInChildren<Image>().color = Color.white;
         }
     }
 
     public int GetPlayerCount()
     {
-        return playerCount;
+        return playerList.Count;
+    }
+
+    public void LoadPlayers(List<PlayerData> list)
+    {
+        foreach (Player p in playerList)
+        {
+            Destroy(p.gameObject);
+        }
+        playerList.Clear();
+        var quote = FindObjectOfType<Quote>();
+        var challengesWereGenerated = CheckIfUsed();
+        if (quote.quoteActive && challengesWereGenerated)
+        {
+            quote.Leave();
+        }
+        if (!quote.quoteActive && !challengesWereGenerated)
+        {
+            quote.Return();
+        }
+        StartCoroutine(WaitABit());
+
+
+        IEnumerator WaitABit()
+        {
+            yield return new WaitForSecondsRealtime(0.2f);
+            foreach (PlayerData pd in list)
+            {
+                AddPlayer(pd, challengesWereGenerated);
+            }
+        }
+
+        bool CheckIfUsed()
+        {
+            var used = false;
+            foreach (PlayerData data in list)
+            {
+                if (data.generatedChallenges.Count > 0)
+                {
+                    used = true;
+                }
+            }
+            return used;
+        }
     }
 
 }

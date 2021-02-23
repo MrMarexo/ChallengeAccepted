@@ -17,8 +17,7 @@ public class AddPopup : MonoBehaviour
             NoTextWarning();
             return;
         }
-        var chal = new Challenge(text.text, toggle.isOn, false, true);
-        FindObjectOfType<ChallengeList>().AddNewChallenge(chal);
+        FindObjectOfType<ChallengeList>().AddNewChallenge(text.text, toggle.isOn);
         ResetData();
         GetComponent<Popup>().ClosePopup();
     }

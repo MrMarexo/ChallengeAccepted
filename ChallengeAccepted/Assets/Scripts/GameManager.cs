@@ -5,13 +5,37 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+    //private static GameManager Instance;
 
     [SerializeField] GameObject transitionCanvas;
 
     int activeScene;
 
+
+    //private void OnDisable()
+    //{
+    //    SceneManager.sceneLoaded -= NewSceneLoaded;
+    //}
+
+    //void NewSceneLoaded(Scene scene, LoadSceneMode mode)
+    //{
+
+    //}
+
     private void Awake()
     {
+        //singleton here
+        //SceneManager.sceneLoaded += NewSceneLoaded;
+        //if (Instance != null && Instance != this)
+        //{
+        //    Destroy(gameObject);
+        //}
+        //else
+        //{
+        //    Instance = this;
+        //    DontDestroyOnLoad(this);
+        //}
+
         activeScene = SceneManager.GetActiveScene().buildIndex;
         transitionCanvas.SetActive(true);
     }

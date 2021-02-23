@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 
 public struct MyQuote
 {
@@ -22,6 +22,8 @@ public class Quote : MonoBehaviour
 
     MyQuote randomQuote;
 
+    public bool quoteActive;
+
     List<MyQuote> quoteList = new List<MyQuote>()
     {
         new MyQuote("If you're going to try, go all the way. There is no other feeling like that. You will be alone with the gods, and the nights will flame with fire. You will ride life straight to perfect laughter. It's the only good fight there is.", "Charles Bukowski"),
@@ -29,7 +31,7 @@ public class Quote : MonoBehaviour
     };
 
 
-    
+
 
     private void Awake()
     {
@@ -43,12 +45,20 @@ public class Quote : MonoBehaviour
         tms[1].text = randomQuote.author;
         quoteGo.transform.localScale = Vector3.zero;
         LeanTween.scale(quoteGo, Vector3.one, 0.4f).setEaseOutBounce();
+        quoteActive = true;
     }
 
     public void Leave()
     {
         LeanTween.moveX(quoteGo, quoteGo.transform.position.x + Screen.width, 0.3f).setEaseInExpo();
+        quoteActive = false;
     }
 
-    
+    public void Return()
+    {
+        LeanTween.moveX(quoteGo, quoteGo.transform.position.x - Screen.width, 0.3f).setEaseInExpo();
+        quoteActive = true;
+    }
+
+
 }

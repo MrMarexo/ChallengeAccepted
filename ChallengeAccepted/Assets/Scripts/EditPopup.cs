@@ -20,8 +20,9 @@ public class EditPopup : MonoBehaviour
             NoTextWarning();
             return;
         }
-        var challenge = new Challenge(text.text, toggle.isOn, chal.isStared, true);
-        item.ChangeAfterEdit(challenge);
+        chal.name = text.text;
+        chal.coronaFriendly = toggle.isOn;
+        item.ChangeAfterEdit(chal);
         ResetData();
         GetComponent<Popup>().ClosePopup();
     }
