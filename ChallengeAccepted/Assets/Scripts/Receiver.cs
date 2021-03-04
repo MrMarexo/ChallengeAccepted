@@ -1,18 +1,20 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+
 public class Receiver : MonoBehaviour, IPointerDownHandler
 {
-    [SerializeField] ReceiverType myType;
+
+    [SerializeField] EListReceiverType myListType;
+
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        GetComponentInParent<ListItem>().ReceiveInfo(myType);
-
+        GetComponentInParent<ListItem>().ReceiveInfo(myListType);
     }
 
-    public ReceiverType GetInfoType()
+    public EListReceiverType GetInfoType()
     {
-        return myType;
+        return myListType;
     }
 }

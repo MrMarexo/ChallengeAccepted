@@ -8,6 +8,7 @@ TagManager:
   - resultNumber
   - popup
   - mask
+  - playerCheck
   - playerStar
   layers:
   - Default

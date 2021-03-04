@@ -2,22 +2,30 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
     [SerializeField] TMP_InputField nameInput;
     [SerializeField] TextMeshProUGUI number;
     [SerializeField] TextMeshProUGUI challengeName;
+    [SerializeField] GameObject toggle;
+
+    Image toggleImage;
+
+    [SerializeField] Sprite checkmark;
+    [SerializeField] Sprite cross;
 
     public PlayerData playerData;
 
     void Awake()
     {
-        UpdateNameListener();
+        AddNameListener();
+        //AddToggleListener();
         PlayerList.playerList.Add(this);
         playerData = new PlayerData(new List<PlayerChallenge>(), "");
+        toggleImage = toggle.GetComponentInChildren<Image>();
     }
-
 
     public void WasAdded(PlayerData data, bool showLastChallenge = false)
     {
@@ -25,9 +33,21 @@ public class Player : MonoBehaviour
         playerData.name = data.name;
         GetComponent<RectTransform>().sizeDelta = new Vector2(1920, 112);
         var inputChildrenArr = nameInput.transform.GetComponentsInChildren<TextMeshProUGUI>();
+        ChangeToCross();
+
 
         if (showLastChallenge)
         {
+            StaticScripts.SetAlphaTo(1, toggleImage);
+            if (playerData.generatedChallenges[playerData.generatedChallenges.Count - 1].isFinished)
+            {
+                toggleImage.sprite = checkmark;
+            }
+            else
+            {
+                toggleImage.sprite = cross;
+            }
+
             var lastChallenge = ChallengeList.FindChallengeByKey(data.generatedChallenges[data.generatedChallenges.Count - 1].key);
             if (lastChallenge.key != data.generatedChallenges[data.generatedChallenges.Count - 1].key)
             {
@@ -44,6 +64,7 @@ public class Player : MonoBehaviour
                 number.transform.localScale = new Vector3(value, value, value);
                 challengeName.transform.localScale = new Vector3(value, value, value);
                 nameInput.transform.localScale = new Vector3(value, value, value);
+                toggle.transform.localScale = new Vector3(value, value, value);
             });
         }
         else
@@ -52,7 +73,6 @@ public class Player : MonoBehaviour
             nameInput.text = data.name;
             LeanTween.scale(nameInput.gameObject, Vector3.one, 0.2f).setEaseOutElastic();
         }
-
     }
 
     public void WasRemoved()
@@ -70,13 +90,46 @@ public class Player : MonoBehaviour
         });
     }
 
-    public void UpdateNameListener()
+    void AddNameListener()
     {
         nameInput.onEndEdit.AddListener(Submit);
+
+        void Submit(string arg)
+        {
+            playerData.name = arg;
+        }
     }
 
-    void Submit(string arg)
+    public void ClickToggle()
     {
-        playerData.name = arg;
+        if (playerData.generatedChallenges[playerData.generatedChallenges.Count - 1].isFinished)
+        {
+            toggleImage.sprite = cross;
+            playerData.generatedChallenges[playerData.generatedChallenges.Count - 1].isFinished = false;
+        }
+        else
+        {
+            toggleImage.sprite = checkmark;
+            playerData.generatedChallenges[playerData.generatedChallenges.Count - 1].isFinished = true;
+
+        }
     }
+
+    public bool ShouldGeneratorStop()
+    {
+        Debug.Log(playerData.generatedChallenges.Count);
+        if (playerData.generatedChallenges.Count > 0)
+        {
+            return !playerData.generatedChallenges[playerData.generatedChallenges.Count - 1].isFinished;
+        }
+        return false;
+    }
+
+    public void ChangeToCross()
+    {
+        toggleImage.sprite = cross;
+    }
+
+
+
 }

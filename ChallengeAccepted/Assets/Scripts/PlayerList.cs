@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -34,6 +33,7 @@ public class PlayerList : MonoBehaviour
     [SerializeField] GameObject prefab2;
 
     [SerializeField] Transform listTransform;
+    [SerializeField] RectTransform scroll;
 
     [SerializeField] GameObject plus;
 
@@ -77,7 +77,15 @@ public class PlayerList : MonoBehaviour
         }
         newPlayer.transform.SetSiblingIndex(listChildrenCount - 1);
         ChangePlusSign();
-
+        if (listTransform.GetComponent<RectTransform>().sizeDelta.y > scroll.sizeDelta.y)
+        {
+            var scrollrect = scroll.GetComponent<ScrollRect>();
+            var curPos = scrollrect.verticalNormalizedPosition;
+            LeanTween.value(curPos, 0, 0.3f).setEaseInExpo().setOnUpdate((value) =>
+            {
+                scrollrect.verticalNormalizedPosition = value;
+            });
+        }
     }
 
     string CalculatePlaceholderName()
@@ -152,5 +160,7 @@ public class PlayerList : MonoBehaviour
             return used;
         }
     }
+
+
 
 }

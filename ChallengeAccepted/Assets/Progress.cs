@@ -30,11 +30,11 @@ public class SavedList
     }
 }
 
-public class ListClass
+public class HelperListClass
 {
     public List<string> strings = new List<string>();
 
-    public ListClass(List<string> strings)
+    public HelperListClass(List<string> strings)
     {
         this.strings = strings;
     }
@@ -52,13 +52,13 @@ public static class Progress
         {
             listOfJsons.Add(JsonUtility.ToJson(chal));
         }
-        var listClass = new ListClass(listOfJsons);
+        var listClass = new HelperListClass(listOfJsons);
         return JsonUtility.ToJson(listClass);
     }
 
     public static List<Challenge> JsonToChallengeList(string json)
     {
-        var listClass = JsonUtility.FromJson<ListClass>(json);
+        var listClass = JsonUtility.FromJson<HelperListClass>(json);
         var challengeList = new List<Challenge>();
         foreach (string line in listClass.strings)
         {
@@ -67,15 +67,14 @@ public static class Progress
         return challengeList;
     }
 
-    public static void SaveCurrentChallengeList()
+    public static void SaveCurrentChallengeList(string key)
     {
-        Debug.Log("loaded list count: " + ChallengeList.challengeList.Count);
-        PlayerPrefs.SetString("savedList", ChallengeListToJson(ChallengeList.challengeList));
+        PlayerPrefs.SetString(key, ChallengeListToJson(ChallengeList.challengeList));
     }
 
-    public static List<Challenge> LoadChallengeList()
+    public static List<Challenge> LoadChallengeList(string key)
     {
-        return JsonToChallengeList(PlayerPrefs.GetString("savedList"));
+        return JsonToChallengeList(PlayerPrefs.GetString(key));
     }
 
 
@@ -90,7 +89,7 @@ public static class Progress
         }
     }
 
-    public static void SavePlayerData(List<PlayerData> playerList)
+    public static void SavePlayerData(List<PlayerData> playerList, string key)
     {
         var finalListOfJsons = new List<string>();
 
@@ -106,15 +105,21 @@ public static class Progress
 
             finalListOfJsons.Add(JsonUtility.ToJson(newClass));
         }
-        PlayerPrefsX.SetStringArray("playerData", finalListOfJsons.ToArray());
+        var finalJson = JsonUtility.ToJson(new HelperListClass(finalListOfJsons));
+        PlayerPrefs.SetString(key, finalJson);
     }
 
-    public static List<PlayerData> LoadPlayerData()
+    public static List<PlayerData> LoadPlayerData(string key)
     {
         var list = new List<PlayerData>();
         var helperList = new List<HelperNameAndJsonClass>();
-        var arr = PlayerPrefsX.GetStringArray("playerData");
-        foreach (string pd in arr)
+        var singleJson = PlayerPrefs.GetString(key, "error");
+        if (singleJson == "error")
+        {
+            Debug.LogWarning("this key: " + key + " doesnt exist");
+        }
+        var jsonListClass = JsonUtility.FromJson<HelperListClass>(singleJson);
+        foreach (string pd in jsonListClass.strings)
         {
             helperList.Add(JsonUtility.FromJson<HelperNameAndJsonClass>(pd));
         }
@@ -129,5 +134,37 @@ public static class Progress
         }
 
         return list;
+    }
+
+    public static void SaveNewSaveItemData(List<SaveItemData> list)
+    {
+        var listOfStrings = new List<string>();
+        foreach (SaveItemData data in list)
+        {
+            listOfStrings.Add(JsonUtility.ToJson(data));
+        }
+        PlayerPrefs.SetString("saveData", JsonUtility.ToJson(new HelperListClass(listOfStrings)));
+    }
+
+    public static List<SaveItemData> LoadSaveItemData()
+    {
+        var finalList = new List<SaveItemData>();
+        var json = PlayerPrefs.GetString("saveData");
+        if (json == "")
+        {
+            Debug.Log("empty save file");
+            return finalList;
+        }
+        var helperClass = JsonUtility.FromJson<HelperListClass>(json);
+        foreach (string jsonString in helperClass.strings)
+        {
+            finalList.Add(JsonUtility.FromJson<SaveItemData>(jsonString));
+        }
+        return finalList;
+    }
+
+    public static void RemoveSavedString(string key)
+    {
+        PlayerPrefs.DeleteKey(key);
     }
 }

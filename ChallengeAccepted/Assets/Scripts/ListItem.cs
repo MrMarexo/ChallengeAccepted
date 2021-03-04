@@ -6,8 +6,6 @@ using UnityEngine;
 using UnityEngine.UI;
 
 
-
-
 public class ListItem : MonoBehaviour
 {
     int listItemIndex;
@@ -42,12 +40,12 @@ public class ListItem : MonoBehaviour
 
         if (!chal.wasCreated)
         {
-            FindReceiver(ReceiverType.Edit).SetActive(false);
+            FindReceiver(EListReceiverType.Edit).SetActive(false);
         }
         else
         {
-            FindReceiver(ReceiverType.Edit).SetActive(true);
-            FindReceiver(ReceiverType.Number).GetComponent<TextMeshProUGUI>().fontStyle = FontStyles.Italic | FontStyles.Bold;
+            FindReceiver(EListReceiverType.Edit).SetActive(true);
+            FindReceiver(EListReceiverType.Number).GetComponent<TextMeshProUGUI>().fontStyle = FontStyles.Italic | FontStyles.Bold;
         }
 
         if (chal.coronaFriendly)
@@ -59,8 +57,8 @@ public class ListItem : MonoBehaviour
         isStared = chal.isStared;
         if (chal.isStared)
         {
-            FindReceiver(ReceiverType.Star).GetComponent<Image>().color = activeStarColor;
-            FindReceiver(ReceiverType.Number).GetComponent<TextMeshProUGUI>().color = activeNumberColor;
+            FindReceiver(EListReceiverType.Star).GetComponent<Image>().color = activeStarColor;
+            FindReceiver(EListReceiverType.Number).GetComponent<TextMeshProUGUI>().color = activeNumberColor;
         }
         image = GetComponent<Image>();
         transform.Find(Names.OPTIONS).gameObject.SetActive(false);
@@ -80,7 +78,7 @@ public class ListItem : MonoBehaviour
         FindObjectOfType<ChallengeList>().SaveEditedChallenge(listItemIndex, chal);
     }
 
-    GameObject FindReceiver(ReceiverType type)
+    GameObject FindReceiver(EListReceiverType type)
     {
         var receivers = GetComponentsInChildren<Receiver>();
         foreach (Receiver r in receivers)
@@ -94,41 +92,41 @@ public class ListItem : MonoBehaviour
         return null;
     }
 
-    public void ReceiveInfo(ReceiverType type)
+    public void ReceiveInfo(EListReceiverType type)
     {
         Debug.Log(type + " received");
         switch (type)
         {
-            case ReceiverType.Delete:
+            case EListReceiverType.Delete:
                 DeleteItem();
                 break;
 
-            case ReceiverType.Edit:
+            case EListReceiverType.Edit:
                 Debug.Log(challenge.name);
                 Resources.FindObjectsOfTypeAll<EditPopup>()[0].InitializeEdit(challenge, this);
                 break;
 
-            case ReceiverType.Star:
+            case EListReceiverType.Star:
                 Star();
                 break;
 
-            case ReceiverType.Trash:
+            case EListReceiverType.Trash:
                 EnableDeleteItemPrompt();
                 break;
 
-            case ReceiverType.CancelDeletePrompt:
+            case EListReceiverType.CancelDeletePrompt:
                 EnableDeleteItemPrompt();
                 break;
 
-            case ReceiverType.Number:
+            case EListReceiverType.Number:
                 Options();
                 break;
 
-            case ReceiverType.DisableOptions:
+            case EListReceiverType.DisableOptions:
                 DisableOptions();
                 break;
 
-            case ReceiverType.None:
+            case EListReceiverType.None:
                 Debug.LogWarning("Set a value for Infotype in the prefab!");
                 break;
 
@@ -143,7 +141,7 @@ public class ListItem : MonoBehaviour
         {
             return;
         }
-        var star = FindReceiver(ReceiverType.Star).transform;
+        var star = FindReceiver(EListReceiverType.Star).transform;
         if (isStared)
         {
             Unstar(star.gameObject);
