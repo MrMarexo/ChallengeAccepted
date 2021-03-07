@@ -117,7 +117,6 @@ public class Player : MonoBehaviour
 
     public bool ShouldGeneratorStop()
     {
-        Debug.Log(playerData.generatedChallenges.Count);
         if (playerData.generatedChallenges.Count > 0)
         {
             return !playerData.generatedChallenges[playerData.generatedChallenges.Count - 1].isFinished;

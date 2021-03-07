@@ -65,6 +65,10 @@ public class PlayerList : MonoBehaviour
         var newPlayerScript = newPlayer.GetComponent<Player>();
         if (data != null)
         {
+            foreach (PlayerChallenge chal in data.generatedChallenges)
+            {
+                Debug.Log("name: " + data.name + "challenge: " + chal.key + " ,finished: " + chal.isFinished);
+            }
             if (data.generatedChallenges.Count == 0)
             {
                 newPlayerScript.WasAdded(data);
@@ -86,6 +90,7 @@ public class PlayerList : MonoBehaviour
                 scrollrect.verticalNormalizedPosition = value;
             });
         }
+
     }
 
     string CalculatePlaceholderName()

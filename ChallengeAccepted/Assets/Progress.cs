@@ -167,4 +167,19 @@ public static class Progress
     {
         PlayerPrefs.DeleteKey(key);
     }
+
+    public static void SaveSearchSettings(SettingsData data, string key)
+    {
+        PlayerPrefs.SetString(key, JsonUtility.ToJson(data));
+    }
+
+    public static SettingsData LoadSearchSettings(string key)
+    {
+        var json = PlayerPrefs.GetString(key, "default");
+        if (json == "default")
+        {
+            return new SettingsData();
+        }
+        return JsonUtility.FromJson<SettingsData>(json);
+    }
 }

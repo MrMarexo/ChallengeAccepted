@@ -25,11 +25,8 @@ public class ChallengeList : MonoBehaviour
     [SerializeField] MessageScript message;
 
 
+    SearchSettings settings;
 
-    [SerializeField] Toggle socialToggle;
-    [SerializeField] Toggle repeatToggle;
-    [SerializeField] Toggle playerRepeatToggle;
-    [SerializeField] Toggle repeatInTurnToggle;
 
     public static List<Challenge> challengeList;
 
@@ -59,6 +56,7 @@ public class ChallengeList : MonoBehaviour
     {
         challengeList = GetComponent<ActualList>().GetList();
         PopulateVisualList();
+        settings = GetComponent<SearchSettings>();
     }
 
     //Populate "physical" list on the popup with texts //////////////////////////////////////////////////////////////////////////////////////////
@@ -123,10 +121,10 @@ public class ChallengeList : MonoBehaviour
 
 
         GetComponent<Quote>().Leave();
-        bool corona = socialToggle.isOn;
-        bool repeat = repeatToggle.isOn;
-        bool playerRepeat = playerRepeatToggle.isOn;
-        bool repeatInTurn = repeatInTurnToggle.isOn;
+        bool corona = settings.SocialToggle;
+        bool repeat = settings.RepeatToggle;
+        bool playerRepeat = settings.PlayerRepeatToggle;
+        bool repeatInTurn = settings.RepeatInTurnToggle;
         var results = GameObject.FindGameObjectsWithTag("result");
         var resultNumbers = GameObject.FindGameObjectsWithTag("resultNumber");
         var checks = GameObject.FindGameObjectsWithTag("playerCheck");

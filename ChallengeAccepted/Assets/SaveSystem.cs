@@ -14,6 +14,22 @@ public class SaveItemData
     }
 }
 
+public class SettingsData
+{
+    public bool socialToggle;
+    public bool repeatToggle;
+    public bool playerRepeatToggle;
+    public bool repeatInTurnToggle;
+
+    public SettingsData(bool socialToggle = false, bool repeatToggle = true, bool playerRepeatToggle = false, bool repeatInTurnToggle = false)
+    {
+        this.socialToggle = socialToggle;
+        this.repeatToggle = repeatToggle;
+        this.playerRepeatToggle = playerRepeatToggle;
+        this.repeatInTurnToggle = repeatInTurnToggle;
+    }
+}
+
 
 public class SaveSystem : MonoBehaviour
 {
@@ -34,6 +50,8 @@ public class SaveSystem : MonoBehaviour
     MessageScript message;
     OptionsSave options;
 
+    SearchSettings settings;
+
     List<SaveItemData> listOfSaveData = new List<SaveItemData>();
 
     private void Start()
@@ -44,8 +62,10 @@ public class SaveSystem : MonoBehaviour
         message = mainPopup.GetComponentInChildren<MessageScript>();
         options = mainPopup.GetComponentInChildren<OptionsSave>();
 
-        //var richData = new PlayerData(new List<PlayerChallenge>() { new PlayerChallenge("#kn15", true), new PlayerChallenge("#kn19", true), new PlayerChallenge("#kn36", true), new PlayerChallenge("#kn57", true) }, "Richiak");
-        //var marexoData = new PlayerData(new List<PlayerChallenge>() { new PlayerChallenge("#kn15", true), new PlayerChallenge("#kn14", true), new PlayerChallenge("#kn62", true) }, "Marexo");
+        settings = GetComponent<SearchSettings>();
+
+        //var richData = new PlayerData(new List<PlayerChallenge>() { new PlayerChallenge("#kn15", true), new PlayerChallenge("#kn19", true), new PlayerChallenge("#kn36", true), new PlayerChallenge("#kn57", true), new PlayerChallenge("#kn118", true), new PlayerChallenge("#kn109", false) }, "Richiak");
+        //var marexoData = new PlayerData(new List<PlayerChallenge>() { new PlayerChallenge("#kn15", true), new PlayerChallenge("#kn14", true), new PlayerChallenge("#kn62", true), new PlayerChallenge("#kn97", true), new PlayerChallenge("#kn53", true) }, "Marexo");
         //var withRich = new List<PlayerData>() { richData, marexoData };
         //var key = listOfSaveData.Find((d) => d.nameToShow == "withRich").key;
         //Progress.SavePlayerData(withRich, GenerateSpecificKeyType(key, EKeyType.playerData));
@@ -230,25 +250,41 @@ public class SaveSystem : MonoBehaviour
     {
         var pdKey = GenerateSpecificKeyType(key, EKeyType.playerData);
         var listKey = GenerateSpecificKeyType(key, EKeyType.list);
+        var setKey = GenerateSpecificKeyType(key, EKeyType.settings);
         var listOfData = new List<PlayerData>();
+        var settingsData = new SettingsData(socialToggle: settings.SocialToggle,
+            repeatToggle: settings.RepeatToggle, playerRepeatToggle: settings.PlayerRepeatToggle, repeatInTurnToggle: settings.RepeatInTurnToggle);
         foreach (Player p in PlayerList.playerList)
         {
             listOfData.Add(p.playerData);
         }
         Progress.SavePlayerData(listOfData, pdKey);
         Progress.SaveCurrentChallengeList(listKey);
+        Progress.SaveSearchSettings(settingsData, setKey);
     }
 
     public void LoadGroup(string key)
     {
         var pdKey = GenerateSpecificKeyType(key, EKeyType.playerData);
         var listKey = GenerateSpecificKeyType(key, EKeyType.list);
+        var setKey = GenerateSpecificKeyType(key, EKeyType.settings);
+
         var loadedPlayerList = Progress.LoadPlayerData(pdKey);
         Debug.Log(loadedPlayerList.Count);
         var loadedChallengeList = Progress.LoadChallengeList(listKey);
         ChallengeList.challengeList = loadedChallengeList;
         GetComponent<ChallengeList>().PopulateVisualList();
         GetComponent<PlayerList>().LoadPlayers(loadedPlayerList);
+        var loadedSettings = Progress.LoadSearchSettings(setKey);
+        SetSettings();
+
+        void SetSettings()
+        {
+            settings.SocialToggle = loadedSettings.socialToggle;
+            settings.RepeatToggle = loadedSettings.repeatToggle;
+            settings.PlayerRepeatToggle = loadedSettings.playerRepeatToggle;
+            settings.RepeatInTurnToggle = loadedSettings.repeatInTurnToggle;
+        }
     }
 
     public void SelectThisKey(string key)
@@ -315,13 +351,19 @@ public class SaveSystem : MonoBehaviour
         {
             return "li#" + key;
         }
-        return "pd#" + key;
+        if (type == EKeyType.playerData)
+        {
+            return "pd#" + key;
+
+        }
+        return "se#" + key;
     }
 
     enum EKeyType
     {
         playerData,
         list,
+        settings,
     }
 
 }

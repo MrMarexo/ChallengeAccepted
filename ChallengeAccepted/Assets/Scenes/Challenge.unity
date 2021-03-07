@@ -3920,6 +3920,7 @@ GameObject:
   - component: {fileID: 745325142}
   - component: {fileID: 745325143}
   - component: {fileID: 745325144}
+  - component: {fileID: 745325145}
   m_Layer: 0
   m_Name: Generator
   m_TagString: Untagged
@@ -3944,10 +3945,6 @@ MonoBehaviour:
     type: 3}
   contextTransform: {fileID: 946752175}
   message: {fileID: 1781685870}
-  socialToggle: {fileID: 1260506955}
-  repeatToggle: {fileID: 502359183}
-  playerRepeatToggle: {fileID: 901758946}
-  repeatInTurnToggle: {fileID: 954753830}
 --- !u!4 &745325140
 Transform:
   m_ObjectHideFlags: 0
@@ -3977,6 +3974,7 @@ MonoBehaviour:
   prefab: {fileID: 4656122747158383647, guid: 7d45575677d38aa43a1ab29f91f89d25, type: 3}
   prefab2: {fileID: 4656122747158383647, guid: 5f04cf342343b7149990e24bf3095683, type: 3}
   listTransform: {fileID: 1815012114}
+  scroll: {fileID: 450378546}
   plus: {fileID: 596256343}
 --- !u!114 &745325142
 MonoBehaviour:
@@ -4022,6 +4020,22 @@ MonoBehaviour:
     type: 3}
   newInputPrefab: {fileID: 109128702716418181, guid: 283b7440d79144f43b5c328fb1c4bf89,
     type: 3}
+--- !u!114 &745325145
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 745325138}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d2e7e8385037dd4ca3751956aa0486f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  socialToggle: {fileID: 1260506955}
+  repeatToggle: {fileID: 502359183}
+  playerRepeatToggle: {fileID: 901758946}
+  repeatInTurnToggle: {fileID: 954753830}
 --- !u!1 &780060776
 GameObject:
   m_ObjectHideFlags: 0
