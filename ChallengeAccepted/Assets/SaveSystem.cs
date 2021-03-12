@@ -20,13 +20,15 @@ public class SettingsData
     public bool repeatToggle;
     public bool playerRepeatToggle;
     public bool repeatInTurnToggle;
+    public bool freeGeneratingToggle;
 
-    public SettingsData(bool socialToggle = false, bool repeatToggle = true, bool playerRepeatToggle = false, bool repeatInTurnToggle = false)
+    public SettingsData(bool socialToggle = false, bool repeatToggle = true, bool playerRepeatToggle = false, bool repeatInTurnToggle = false, bool freeGeneratingToggle = false)
     {
         this.socialToggle = socialToggle;
         this.repeatToggle = repeatToggle;
         this.playerRepeatToggle = playerRepeatToggle;
         this.repeatInTurnToggle = repeatInTurnToggle;
+        this.freeGeneratingToggle = freeGeneratingToggle;
     }
 }
 
@@ -253,7 +255,8 @@ public class SaveSystem : MonoBehaviour
         var setKey = GenerateSpecificKeyType(key, EKeyType.settings);
         var listOfData = new List<PlayerData>();
         var settingsData = new SettingsData(socialToggle: settings.SocialToggle,
-            repeatToggle: settings.RepeatToggle, playerRepeatToggle: settings.PlayerRepeatToggle, repeatInTurnToggle: settings.RepeatInTurnToggle);
+            repeatToggle: settings.RepeatToggle, playerRepeatToggle: settings.PlayerRepeatToggle, repeatInTurnToggle: settings.RepeatInTurnToggle,
+            freeGeneratingToggle: settings.FreeGeneratingToggle);
         foreach (Player p in PlayerList.playerList)
         {
             listOfData.Add(p.playerData);
@@ -284,6 +287,7 @@ public class SaveSystem : MonoBehaviour
             settings.RepeatToggle = loadedSettings.repeatToggle;
             settings.PlayerRepeatToggle = loadedSettings.playerRepeatToggle;
             settings.RepeatInTurnToggle = loadedSettings.repeatInTurnToggle;
+            settings.FreeGeneratingToggle = loadedSettings.freeGeneratingToggle;
         }
     }
 

@@ -9,6 +9,7 @@ public class SearchSettings : MonoBehaviour
     [SerializeField] Toggle repeatToggle;
     [SerializeField] Toggle playerRepeatToggle;
     [SerializeField] Toggle repeatInTurnToggle;
+    [SerializeField] Toggle freeGeneratingToggle;
 
     public bool SocialToggle
     {
@@ -30,4 +31,19 @@ public class SearchSettings : MonoBehaviour
         get => repeatInTurnToggle.isOn;
         set => repeatInTurnToggle.isOn = value;
     }
+    public bool FreeGeneratingToggle
+    {
+        get => freeGeneratingToggle.isOn;
+        set => freeGeneratingToggle.isOn = value;
+    }
+
+    private void Start()
+    {
+        SocialToggle = true;
+        RepeatToggle = true;
+        PlayerRepeatToggle = false;
+        RepeatInTurnToggle = false;
+        FreeGeneratingToggle = false;
+    }
+
 }

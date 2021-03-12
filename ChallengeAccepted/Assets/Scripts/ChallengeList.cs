@@ -84,9 +84,11 @@ public class ChallengeList : MonoBehaviour
     //Generate  new challenge for each player /////////////////////////////////////////////////////////////////////////////////////////////////
     public void Generate()
     {
+        bool freeGenerating = settings.FreeGeneratingToggle;
+
         foreach (Player player in PlayerList.playerList)
         {
-            if (player.ShouldGeneratorStop())
+            if (player.ShouldGeneratorStop() && !freeGenerating)
             {
                 message.Appear("All players have to finish their challenges!");
                 return;

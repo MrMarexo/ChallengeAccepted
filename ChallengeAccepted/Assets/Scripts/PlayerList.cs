@@ -34,6 +34,7 @@ public class PlayerList : MonoBehaviour
 
     [SerializeField] Transform listTransform;
     [SerializeField] RectTransform scroll;
+    [SerializeField] Image scrollbar;
 
     [SerializeField] GameObject plus;
 
@@ -44,8 +45,8 @@ public class PlayerList : MonoBehaviour
     {
         playerList.Clear();
         AddPlayer();
-        ChangePlusSign();
-
+        ChangePlusSignColor();
+        StaticScripts.SetAlphaTo(0, scrollbar);
     }
 
     public void AddFromButton()
@@ -80,8 +81,14 @@ public class PlayerList : MonoBehaviour
             newPlayerScript.WasAdded(new PlayerData(new List<PlayerChallenge>(), CalculatePlaceholderName()));
         }
         newPlayer.transform.SetSiblingIndex(listChildrenCount - 1);
-        ChangePlusSign();
-        if (listTransform.GetComponent<RectTransform>().sizeDelta.y > scroll.sizeDelta.y)
+        ChangePlusSignColor();
+        StartCoroutine(OnScrollbarChanged());
+    }
+
+    IEnumerator OnScrollbarChanged()
+    {
+        yield return new WaitForSecondsRealtime(0.1f);
+        if (scrollbar.GetComponent<Scrollbar>().size < 1)
         {
             var scrollrect = scroll.GetComponent<ScrollRect>();
             var curPos = scrollrect.verticalNormalizedPosition;
@@ -89,8 +96,13 @@ public class PlayerList : MonoBehaviour
             {
                 scrollrect.verticalNormalizedPosition = value;
             });
-        }
+            Debug.Log("list y size: " + listTransform.GetComponent<RectTransform>().rect.height + " scroll y size: " + scroll.rect.height);
 
+            LeanTween.value(scrollbar.color.a, 1, 0.3f).setEaseInExpo().setOnUpdate((value) =>
+            {
+                StaticScripts.SetAlphaTo(value, scrollbar);
+            });
+        }
     }
 
     string CalculatePlaceholderName()
@@ -106,7 +118,7 @@ public class PlayerList : MonoBehaviour
         itemToRemove.GetComponent<Player>().WasRemoved();
     }
 
-    void ChangePlusSign()
+    void ChangePlusSignColor()
     {
         if (playerList.Count % 2 == 0)
         {
