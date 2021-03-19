@@ -12,8 +12,7 @@ public class ActualList : MonoBehaviour
     //**************************For uploading a new list*******************************
     //List<Challenge> newList = new List<Challenge>()
     //{
-
-    //    //paste the challenges here
+    //    //
     //};
 
     //private void Start()

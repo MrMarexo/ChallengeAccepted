@@ -73,10 +73,10 @@ public class SaveSystem : MonoBehaviour
         //Progress.SavePlayerData(withRich, GenerateSpecificKeyType(key, EKeyType.playerData));
         //Progress.SaveCurrentChallengeList(GenerateSpecificKeyType(key, EKeyType.list));
 
-        //var michalData = new PlayerData(new List<PlayerChallenge>() { new PlayerChallenge("#kn74", true), new PlayerChallenge("#kn50", true), }, "Michal");
-        //var sethData = new PlayerData(new List<PlayerChallenge>() { new PlayerChallenge("#kn113", true), new PlayerChallenge("#kn108", true), }, "Seth");
-        //var andreData = new PlayerData(new List<PlayerChallenge>() { new PlayerChallenge("#kn55", true), new PlayerChallenge("#kn2", true), }, "Andre");
-        //var marexoData = new PlayerData(new List<PlayerChallenge>() { new PlayerChallenge("#kn48", true), new PlayerChallenge("#kn87", true), }, "Marexo");
+        //var michalData = new PlayerData(new List<PlayerChallenge>() { new PlayerChallenge("#kn74", true), new PlayerChallenge("#kn50", true), new PlayerChallenge("#kn88", true), new PlayerChallenge("#kn86", true) }, "Michal");
+        //var sethData = new PlayerData(new List<PlayerChallenge>() { new PlayerChallenge("#kn113", true), new PlayerChallenge("#kn108", true), new PlayerChallenge("#kn118", true), new PlayerChallenge("#kn49", true) }, "Seth");
+        //var andreData = new PlayerData(new List<PlayerChallenge>() { new PlayerChallenge("#kn55", true), new PlayerChallenge("#kn2", true), new PlayerChallenge("#kn30", true), new PlayerChallenge("#kn29", true) }, "Andre");
+        //var marexoData = new PlayerData(new List<PlayerChallenge>() { new PlayerChallenge("#kn48", true), new PlayerChallenge("#kn87", true), new PlayerChallenge("#kn81", true), new PlayerChallenge("#kn94", true) }, "Marexo");
         //var withGroup = new List<PlayerData>() { michalData, sethData, andreData, marexoData };
         //var key = listOfSaveData.Find((d) => d.nameToShow == "withGroup").key;
         //Progress.SavePlayerData(withGroup, GenerateSpecificKeyType(key, EKeyType.playerData));

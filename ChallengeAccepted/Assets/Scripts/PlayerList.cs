@@ -68,7 +68,7 @@ public class PlayerList : MonoBehaviour
         {
             foreach (PlayerChallenge chal in data.generatedChallenges)
             {
-                Debug.Log("name: " + data.name + "challenge: " + chal.key + " ,finished: " + chal.isFinished);
+                //Debug.Log("name: " + data.name + "challenge: " + chal.key + " ,finished: " + chal.isFinished);
             }
             if (data.generatedChallenges.Count == 0)
             {
@@ -83,6 +83,13 @@ public class PlayerList : MonoBehaviour
         newPlayer.transform.SetSiblingIndex(listChildrenCount - 1);
         ChangePlusSignColor();
         StartCoroutine(OnScrollbarChanged());
+        ScrollToBottom();
+        Wiggle();
+    }
+
+    void Wiggle()
+    {
+        listTransform.position = new Vector3(listTransform.position.x, listTransform.position.y + 0.1f);
     }
 
     IEnumerator OnScrollbarChanged()
@@ -90,19 +97,30 @@ public class PlayerList : MonoBehaviour
         yield return new WaitForSecondsRealtime(0.1f);
         if (scrollbar.GetComponent<Scrollbar>().size < 1)
         {
-            var scrollrect = scroll.GetComponent<ScrollRect>();
-            var curPos = scrollrect.verticalNormalizedPosition;
-            LeanTween.value(curPos, 0, 0.3f).setEaseInExpo().setOnUpdate((value) =>
-            {
-                scrollrect.verticalNormalizedPosition = value;
-            });
-            Debug.Log("list y size: " + listTransform.GetComponent<RectTransform>().rect.height + " scroll y size: " + scroll.rect.height);
 
             LeanTween.value(scrollbar.color.a, 1, 0.3f).setEaseInExpo().setOnUpdate((value) =>
             {
                 StaticScripts.SetAlphaTo(value, scrollbar);
             });
         }
+        else
+        {
+            LeanTween.value(scrollbar.color.a, 0, 0.3f).setEaseInExpo().setOnUpdate((value) =>
+            {
+                StaticScripts.SetAlphaTo(value, scrollbar);
+            });
+        }
+    }
+
+    public void ScrollToBottom()
+    {
+        var scrollrect = scroll.GetComponent<ScrollRect>();
+        var curPos = scrollrect.verticalNormalizedPosition;
+        LeanTween.value(curPos, 0, 0.3f).setEaseInExpo().setOnUpdate((value) =>
+        {
+            scrollrect.verticalNormalizedPosition = value;
+        });
+
     }
 
     string CalculatePlaceholderName()
@@ -177,6 +195,8 @@ public class PlayerList : MonoBehaviour
             return used;
         }
     }
+
+
 
 
 

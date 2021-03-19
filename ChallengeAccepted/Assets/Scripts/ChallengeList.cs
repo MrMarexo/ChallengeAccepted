@@ -54,8 +54,7 @@ public class ChallengeList : MonoBehaviour
 
     void Start()
     {
-        challengeList = GetComponent<ActualList>().GetList();
-        PopulateVisualList();
+        LoadGeneralList();
         settings = GetComponent<SearchSettings>();
     }
 
@@ -247,6 +246,7 @@ public class ChallengeList : MonoBehaviour
             {
                 StaticScripts.SetAlphaTo(value, checkImage);
             });
+            GetComponent<PlayerList>().ScrollToBottom();
         }
 
     }
@@ -328,6 +328,12 @@ public class ChallengeList : MonoBehaviour
     public void LastTwoInList()
     {
         ScrollToBottomOfList();
+    }
+
+    public void LoadGeneralList()
+    {
+        challengeList = GetComponent<ActualList>().GetList();
+        PopulateVisualList();
     }
 
 }

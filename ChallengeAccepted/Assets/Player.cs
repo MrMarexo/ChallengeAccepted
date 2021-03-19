@@ -129,6 +129,13 @@ public class Player : MonoBehaviour
         toggleImage.sprite = cross;
     }
 
+    public void ShowOptions()
+    {
+        number.gameObject.SetActive(false);
+        toggle.SetActive(false);
+        challengeName.gameObject.SetActive(false);
 
+
+    }
 
 }
